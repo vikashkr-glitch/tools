@@ -1,0 +1,105 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>PDF Crop — Demo</title>
+  <style>
+    body{font-family:Arial,Helvetica,sans-serif;background:#f4f6f8;color:#111;padding:18px}
+    .wrap{max-width:900px;margin:0 auto;background:#fff;padding:18px;border-radius:8px;box-shadow:0 6px 24px rgba(0,0,0,0.06)}
+    .urow{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:10px}
+    label{font-weight:600}
+    input[type=number]{width:100px;padding:6px}
+    .preview-frame{width:100%;height:600px;border:1px solid #ddd;margin-top:12px}
+    .btn{background:#007bff;color:#fff;padding:10px 14px;border-radius:6px;border:none;cursor:pointer}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <h2>Crop PDF (demo)</h2>
+    <div>
+      <input type="file" id="pdfFile" accept="application/pdf" />
+    </div>
+
+    <div style="margin-top:12px">
+      <label>Page index (0-based):</label>
+      <input type="number" id="pageIndex" value="0" min="0" />
+    </div>
+
+    <div class="urow" style="margin-top:8px">
+      <div>
+        <label>X (px):</label><br /><input type="number" id="cropX" value="50" />
+      </div>
+      <div>
+        <label>Y (px, top-origin):</label><br /><input type="number" id="cropY" value="50" />
+      </div>
+      <div>
+        <label>W (px):</label><br /><input type="number" id="cropW" value="300" />
+      </div>
+      <div>
+        <label>H (px):</label><br /><input type="number" id="cropH" value="400" />
+      </div>
+    </div>
+
+    <div style="margin-top:10px">
+      <button class="btn" id="doCrop">Crop PDF</button>
+      <a id="downloadLink" style="margin-left:12px;display:none">Download result</a>
+    </div>
+
+    <iframe id="resultFrame" class="preview-frame" style="display:none"></iframe>
+  </div>
+
+  <script>
+    const pdfFile = document.getElementById('pdfFile');
+    const doCrop = document.getElementById('doCrop');
+    const resultFrame = document.getElementById('resultFrame');
+    const downloadLink = document.getElementById('downloadLink');
+
+    doCrop.addEventListener('click', async () => {
+      if (!pdfFile.files || pdfFile.files.length === 0) {
+        alert('Please choose a PDF file');
+        return;
+      }
+      const f = pdfFile.files[0];
+      const page = document.getElementById('pageIndex').value || 0;
+      const x = Number(document.getElementById('cropX').value || 0);
+      const y = Number(document.getElementById('cropY').value || 0);
+      const w = Number(document.getElementById('cropW').value || 0);
+      const h = Number(document.getElementById('cropH').value || 0);
+
+      const form = new FormData();
+      form.append('file', f);
+      form.append('page', page);
+      form.append('x', x);
+      form.append('y', y);
+      form.append('w', w);
+      form.append('h', h);
+
+      doCrop.disabled = true;
+      doCrop.textContent = 'Processing...';
+
+      try {
+        const res = await fetch('/crop', { method: 'POST', body: form });
+        if (!res.ok) {
+          const err = await res.json().catch(()=>({error:'Unknown error'}));
+          alert('Error: ' + (err.error || JSON.stringify(err)));
+          return;
+        }
+        const blob = await res.blob();
+        const url = URL.createObjectURL(blob);
+        resultFrame.style.display = 'block';
+        resultFrame.src = url;
+        downloadLink.href = url;
+        downloadLink.download = 'cropped.pdf';
+        downloadLink.textContent = 'Download cropped PDF';
+        downloadLink.style.display = 'inline-block';
+      } catch (e) {
+        alert('Request failed: ' + e.message);
+      } finally {
+        doCrop.disabled = false;
+        doCrop.textContent = 'Crop PDF';
+      }
+    });
+  </script>
+</body>
+</html>
