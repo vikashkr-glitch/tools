@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Crop PDF Online | Multi Tool Hub</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background-color: #121212;
+      color: #f1f1f1;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      min-height: 100vh;
+    }
+    .container {
+      background: #1e1e1e;
+      margin-top: 40px;
+      border-radius: 12px;
+      padding: 25px;
+      width: 90%;
+      max-width: 700px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.5);
+    }
+    h1 {
+      text-align: center;
+      color: #fff;
+      font-size: 1.8rem;
+    }
+    .upload-box {
+      border: 2px dashed #444;
+      border-radius: 8px;
+      padding: 30px;
+      text-align: center;
+      margin: 20px 0;
+      background: #2b2b2b;
+      transition: 0.3s;
+    }
+    .upload-box.dragover {
+      border-color: #00bfff;
+      background: #333;
+    }
+    .upload-box input[type="file"] {
+      display: none;
+    }
+    .btn {
+      display: inline-block;
+      background: #00bfff;
+      color: #fff;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      margin: 10px 0;
+      transition: 0.3s;
+    }
+    .btn:hover {
+      background: #009acd;
+    }
+    .status {
+      text-align: center;
+      margin: 10px 0;
+      font-size: 0.9rem;
+      color: #ccc;
+    }
+    .sidebar {
+      position: fixed;
+      right: 20px;
+      top: 100px;
+      width: 300px;
+      height: auto;
+      background: #1a1a1a;
+      border-radius: 10px;
+      padding: 10px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.4);
+    }
+    .adsense-box {
+      width: 100%;
+      height: 250px;
+      background: #222;
+      border: 1px dashed #444;
+      border-radius: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #777;
+      font-size: 0.9rem;
+    }
+    @media(max-width:900px){
+      .sidebar{display:none;}
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h1>Crop PDF Files Online</h1>
+    <div class="upload-box" id="dropZone">
+      <p>Choose, paste, or drag and drop a file here:</p>
+      <label for="fileInput" class="btn">Choose File</label>
+      <input type="file" id="fileInput" accept="application/pdf" />
+    </div>
+    <div class="status" id="status">Supported file type: PDF (Max size 200MB)</div>
+    <div style="text-align:center;">
+      <button class="btn" id="uploadBtn">Upload</button>
+    </div>
+    <p style="font-size:0.8rem; color:#aaa; text-align:center; margin-top:10px;">All uploaded files are automatically deleted 1 hour after upload.<br>For permanent links, you can use: <span style="color:#00bfff;">https://yourdomain.com/crop-pdf?url=https://example.com/source.pdf</span></p>
+  </div>
+
+  <div class="sidebar">
+    <div class="adsense-box">
+      AddSense Ad Area (Paste your ad code here)
+    </div>
+  </div>
+
+  <script>
+    const dropZone = document.getElementById('dropZone');
+    const fileInput = document.getElementById('fileInput');
+    const statusText = document.getElementById('status');
+
+    dropZone.addEventListener('dragover', (e) => {
+      e.preventDefault();
+      dropZone.classList.add('dragover');
+    });
+
+    dropZone.addEventListener('dragleave', () => {
+      dropZone.classList.remove('dragover');
+    });
+
+    dropZone.addEventListener('drop', (e) => {
+      e.preventDefault();
+      dropZone.classList.remove('dragover');
+      handleFile(e.dataTransfer.files[0]);
+    });
+
+    fileInput.addEventListener('change', (e) => handleFile(e.target.files[0]));
+
+    function handleFile(file) {
+      if (!file) return;
+      if (file.type !== 'application/pdf') {
+        alert('Please upload a PDF file only.');
+        return;
+      }
+      statusText.textContent = `Loaded file: ${file.name}`;
+    }
+  </script>
+</body>
+</html>
